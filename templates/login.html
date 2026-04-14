@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - DiDex</title>
+    <style>
+        body {
+            background-color: #0f172a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .login-box {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .logo-text {
+            font-size: 80px;
+            font-weight: 800;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 40px;
+            filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.4));
+            letter-spacing: -2px;
+        }
+
+        input {
+            width: 100%;
+            padding: 16px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            border: 1px solid #1e293b;
+            background-color: #1e293b;
+            color: white;
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 1px #38bdf8;
+        }
+
+        .btn-entrar {
+            width: 100%;
+            padding: 16px;
+            background-color: #38bdf8;
+            color: #0f172a;
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .btn-entrar:hover {
+            background-color: #7dd3fc;
+            transform: scale(1.02);
+        }
+
+        .link-cadastro {
+            margin-top: 25px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .link-cadastro a {
+            color: #38bdf8;
+            text-decoration: none;
+        }
+
+        #erro-login {
+            color: #ff4d4d;
+            font-size: 14px;
+            display: none;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-box">
+    <div class="logo-text">DiDex</div>
+    
+    <div id="erro-login">⚠️ Usuário ou senha incorretos.</div>
+
+    <input type="text" id="usuario_login" oninput="limparErro(this)" placeholder="Nome de usuário ou e-mail">
+<input type="password" id="senha_login" oninput="limparErro(this)" placeholder="Senha">
+
+<button type="button" onclick="fazerLogin()" class="btn-entrar">Entrar</button>
+
+    <p class="link-cadastro">
+        Não tem conta? <a href="/cadastro">Cadastre-se</a>
+    </p>
+</div>
+<script>
+async function fazerLogin() {
+    const user = document.getElementById('usuario_login').value;
+    const pass = document.getElementById('senha_login').value;
+    const erroDiv = document.getElementById('erro-login');
+
+    const dados = new URLSearchParams();
+    dados.append('email_usuario', user);
+    dados.append('senha', pass);
+
+    try {
+        const response = await fetch('/login', {
+            method: 'POST',
+            body: dados
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.status === 'sucesso') {
+            window.location.href = '/home';
+        } else {
+            // 1. Mostra a mensagem vermelha
+            erroDiv.style.display = 'block';
+
+            // 2. PINTA AS BORDAS DE VERMELHO
+            document.getElementById('usuario_login').style.borderColor = '#ff4d4d';
+            document.getElementById('senha_login').style.borderColor = '#ff4d4d';
+            
+            // 3. Adiciona o brilho vermelho
+            document.getElementById('usuario_login').style.boxShadow = '0 0 5px rgba(255, 77, 77, 0.5)';
+            document.getElementById('senha_login').style.boxShadow = '0 0 5px rgba(255, 77, 77, 0.5)';
+        }
+    } catch (err) {
+        console.error("Erro no JS: ", err);
+    }
+}
+
+// ESTA FUNÇÃO FICA FORA DA OUTRA
+function limparErro(input) {
+    // Volta a borda para a cor original (azul escura) e tira o brilho
+    input.style.borderColor = '#1e293b';
+    input.style.boxShadow = 'none';
+    
+    // Esconde a mensagem de texto do erro
+    document.getElementById('erro-login').style.display = 'none';
+}
+</script>
+
+</body>
+</html>

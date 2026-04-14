@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro - DiDex</title>
+    <style>
+        body {
+            background-color: #0f172a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .cadastro-box {
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .logo-text {
+            font-size: 50px;
+            font-weight: 800;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 30px;
+            filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.3));
+            letter-spacing: -1px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 12px;
+            border-radius: 10px;
+            border: 1px solid #334155;
+            background-color: #1e293b;
+            color: white;
+            font-size: 15px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: #38bdf8;
+        }
+
+        .btn-entrar {
+            width: 100%;
+            padding: 16px;
+            background-color: #38bdf8;
+            color: #0f172a;
+            border: none;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: transform 0.2s;
+        }
+
+        .btn-entrar:hover {
+            transform: scale(1.02);
+            background-color: #7dd3fc;
+        }
+
+        .msg-erro {
+            color: #ff4d4d;
+            font-size: 12px;
+            display: none;
+            margin-bottom: 10px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        #erro-geral {
+            text-align: center;
+            font-size: 14px;
+            background: rgba(255, 77, 77, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cadastro-box">
+        <div class="logo-text">Crie sua conta</div>
+
+        <div id="erro-geral" class="msg-erro"></div>
+
+        <input type="text" id="nome" placeholder="Nome" autocomplete="off">
+        
+        <input type="text" id="sobrenome" placeholder="Sobrenome" autocomplete="off">
+
+        <input type="text" id="usuario_cad" placeholder="Nome de usuário" autocomplete="off" onblur="validarUsuario()">
+        <div id="erro-usuario" class="msg-erro">⚠️ Este nome de usuário não está disponível.</div>
+
+        <input type="email" id="email_cad" placeholder="E-mail" autocomplete="off" onblur="validarEmail()">
+        <div id="erro-email" class="msg-erro">⚠️ Este e-mail já está cadastrado.</div>
+
+        <input type="password" id="senha_cad" placeholder="Senha" autocomplete="new-password">
+
+        <input type="text" id="data_nasc" placeholder="Data de Nascimento (dd/mm/aaaa)" maxlength="10" oninput="mascaraData(this)" autocomplete="off">
+
+        <button type="button" onclick="fazerCadastro()" class="btn-entrar">Cadastrar</button>
+
+        <p style="margin-top: 25px; color: #94a3b8; font-size: 14px;">
+            Já tem conta? <a href="/login" style="color: #38bdf8; text-decoration: none;">Faça login</a>
+        </p>
+    </div>
+
+    <script>
+    // Máscara da Data
+    function mascaraData(input) {
+        let v = input.value.replace(/\D/g, "");
+        if (v.length > 8) v = v.slice(0, 8);
+        if (v.length >= 5) {
+            input.value = v.substring(0, 2) + "/" + v.substring(2, 4) + "/" + v.substring(4, 8);
+        } else if (v.length >= 3) {
+            input.value = v.substring(0, 2) + "/" + v.substring(2, 4);
+        } else {
+            input.value = v;
+        }
+    }
+
+    // Validação de Usuário Existente
+    async function validarUsuario() {
+        const username = document.getElementById('usuario_cad').value;
+        const erroDiv = document.getElementById('erro-usuario');
+        const input = document.getElementById('usuario_cad');
+        if (!username) return;
+
+        const response = await fetch('/checar_usuario', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({username: username})
+        });
+        const data = await response.json();
+        if (!data.disponivel) {
+            erroDiv.style.display = 'block';
+            input.style.borderColor = '#ff4d4d';
+        } else {
+            erroDiv.style.display = 'none';
+            input.style.borderColor = '#334155';
+        }
+    }
+
+    // Validação de E-mail Existente
+    async function validarEmail() {
+        const email = document.getElementById('email_cad').value;
+        const erroDiv = document.getElementById('erro-email');
+        const input = document.getElementById('email_cad');
+        if (!email) return;
+
+        const response = await fetch('/checar_email', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({email: email})
+        });
+        const data = await response.json();
+        if (!data.disponivel) {
+            erroDiv.style.display = 'block';
+            input.style.borderColor = '#ff4d4d';
+        } else {
+            erroDiv.style.display = 'none';
+            input.style.borderColor = '#334155';
+        }
+    }
+
+    // FUNÇÃO PRINCIPAL DE CADASTRO
+    async function fazerCadastro() {
+        const erroGeral = document.getElementById('erro-geral');
+        erroGeral.style.display = 'none';
+
+        const dados = new URLSearchParams();
+        dados.append('nome', document.getElementById('nome').value);
+        dados.append('sobrenome', document.getElementById('sobrenome').value);
+        dados.append('usuario', document.getElementById('usuario_cad').value);
+        dados.append('email', document.getElementById('email_cad').value);
+        dados.append('senha', document.getElementById('senha_cad').value);
+        dados.append('data_nascimento', document.getElementById('data_nasc').value);
+
+        try {
+            const response = await fetch('/cadastro', {
+                method: 'POST',
+                body: dados
+            });
+
+            if (response.redirected) {
+                // Se o Flask mandar para a página de verificação de e-mail
+                window.location.href = response.url;
+            } else {
+                const result = await response.json();
+                if (result.status === 'erro') {
+                    erroGeral.innerText = "⚠️ " + result.mensagem;
+                    erroGeral.style.display = 'block';
+                }
+            }
+        } catch (e) {
+            console.error("Erro no cadastro:", e);
+        }
+    }
+    </script>
+</body>
+</html>

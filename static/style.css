@@ -1,0 +1,273 @@
+/* Importando uma fonte moderna do Google */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+
+:root {
+    --bg-color: #0f172a;        /* Fundo Azul Escuro Profundo */
+    --card-bg: #1e293b;        /* Fundo dos Cards/Botões */
+    --accent-color: #38bdf8;    /* Azul Elétrico (Marca DiDex) */
+    --text-main: #f8fafc;       /* Branco Purificado */
+    --text-muted: #94a3b8;      /* Cinza para textos menores */
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    flex-direction: column;  /* ISSO AQUI joga tudo para baixo */
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    text-align: center;
+}
+
+/* Estilo do Nome DiDex */
+.logo-DiDex {
+    font-size: 5rem;
+    font-weight: 800;
+    letter-spacing: -3px;
+    margin: 0;
+    /* Degradê bonitão no texto */
+    background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 10px 15px rgba(56, 189, 248, 0.2));
+}
+
+.slogan {
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    letter-spacing: 1px;
+}
+
+/* Container dos Botões */
+.auth-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+/* Estilo Geral dos Botões */
+.btn {
+    padding: 12px 28px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    font-size: 1rem;
+    border: none;
+}
+
+.btn-DiDex {
+    background-color: var(--accent-color);
+    color: #0f172a;
+}
+
+.btn-DiDex:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(56, 189, 248, 0.3);
+    background-color: #7dd3fc;
+}
+
+.btn-outline {
+    background-color: transparent;
+    border: 2px solid var(--card-bg);
+    color: var(--text-main);
+}
+
+.btn-outline:hover {
+    background-color: var(--card-bg);
+    border-color: var(--accent-color);
+}
+.logo-DiDex {
+    margin-bottom: 10px; /* Espaço abaixo do nome */
+}
+
+.slogan {
+    margin-bottom: 30px; /* Espaço abaixo da frase */
+    display: block;      /* Garante que ela ocupe a linha toda */
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 15px;           /* Espaço entre um botão e outro */
+    margin-top: 10px;
+}
+/* --- Arredondando Campos de Texto (Input e Textarea) --- */
+input, 
+textarea {
+    width: 100%;                  /* Garante que ocupe a largura total do container */
+    padding: 12px;                /* Dá um espaço interno maior, mais confortável */
+    margin-bottom: 15px;          /* Espaço entre um campo e outro */
+    
+    /* AQUI ESTÁ O SEGREDO DO REDONDINHO */
+    border-radius: 12px;          /* Raio de canto similar ao do Instagram */
+    
+    background-color: var(--card-bg); /* Use a cor de fundo que definimos para cards */
+    color: var(--text-main);
+    border: 1px solid rgba(148, 163, 184, 0.3); /* Uma borda sutil, como a do Instagram */
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-sizing: border-box;       /* Importante para o padding não 'estourar' a largura */
+}
+
+/* Efeito de borda azul quando clica no campo */
+input:focus, 
+textarea:focus {
+    outline: none;                /* Remove a borda padrão do navegador */
+    border-color: var(--accent-color); /* Coloca a borda azul da marca DiDex */
+}
+
+/* --- Arredondando os Botões --- */
+.btn {
+    padding: 12px 28px;
+    border-radius: 12px;          /* O mesmo raio dos inputs, para combinar */
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    font-size: 1rem;
+    display: inline-block;       /* Garante comportamento correto do botão */
+    border: none;
+}
+
+/* Ajuste específico para o formulário de postagem */
+.post-box form {
+    display: flex;
+    flex-direction: column;       /* Garante que o botão fique abaixo do textarea */
+    align-items: stretch;        /* Opcional: faz o botão ter a mesma largura */
+}
+
+.post-box button[type="submit"] {
+    align-self: flex-start;       /* Mantém o botão alinhado à esquerda se não quiser ele largo */
+    margin-top: 10px;
+}
+/* --- Estilos para o Login Direto na Home --- */
+
+.login-container-home {
+    width: 100%;
+    max-width: 320px;    /* Mantém o formulário estreito e elegante como o do Instagram */
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+}
+
+.home-login-form {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Estilo do Divisor "OU" */
+.divider {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+    color: var(--text-muted);
+}
+
+.divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.divider span {
+    padding: 0 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.slogan-small {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+}
+.code-container {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.code-input {
+    width: 45px;
+    height: 60px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    background-color: white;
+    color: #111827;
+    transition: all 0.2s;
+}
+
+.code-input:focus {
+    border-color: #0f172a; /* Azul do Mercado Livre */
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    .code-container {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 40px 0; /* Aumentei a margem para 40px para dar respiro */
+}
+}
+.code-input.error {
+    border-color: #ff4d4d !important;
+    background-color: #fff5f5;
+    color: #ff4d4d;
+}
+#erro-mensagem {
+    margin-bottom: 20px; /* Ajuste o valor como preferir */
+}
+.btn {
+    margin-top: 20px;
+    /* ... seus outros estilos do botão ... */
+}
+/* Limita a largura do formulário e centraliza */
+.form-container {
+    max-width: 400px; /* Largura ideal para formulários */
+    margin: 0 auto;   /* Centraliza na tela */
+    padding: 20px;
+}
+
+/* Estilo para os campos de texto ficarem padronizados */
+input[type="text"], 
+input[type="email"], 
+input[type="password"], 
+input[type="date"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: 1px solid #334155;
+    background-color: #1e293b; /* Tom escuro combinando com o DiDex */
+    color: white;
+    box-sizing: border-box; /* Garante que o padding não aumente a largura */
+}
+
+/* O Botão Bonito (Igual ao de verificar) */
+.btn-cadastrar {
+    width: 100%;
+    padding: 12px;
+    background-color: white;
+    color: #0f172a;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 10px;
+}
+
+.btn-cadastrar:hover {
+    background-color: #e2e8f0;
+}
+/* Se quiser manter o tema escuro do DiDex, mude o background-color e a borda */
