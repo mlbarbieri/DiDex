@@ -11,7 +11,7 @@ from flask_bcrypt import Bcrypt
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 app.config['SECRET_KEY'] = 'uma_chave_muito_segura_aqui'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dex.db'
 db = SQLAlchemy(app)
 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -100,9 +100,9 @@ def cadastro():
             return jsonify({'status': 'sucesso', 'url': url_for('verificar_email', email=email)})
 
         except Exception as e:
-            db.session.rollback() # Cancela se der erro no banco
-            print(f"Erro no banco: {e}")
-            return jsonify({'status': 'erro', 'mensagem': 'Usuário ou E-mail já existem!'}), 400
+            db.session.rollback() 
+            print(f"ERRO REAL DO BANCO: {e}") # Isso vai aparecer nos Logs do Render
+            return jsonify({'status': 'erro', 'mensagem': f'Erro: {str(e)}'}), 400
 
     return render_template('cadastro.html')
 
