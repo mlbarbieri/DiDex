@@ -6,8 +6,10 @@ from flask_mail import Mail, Message
 import random 
 import os
 from flask import Flask, render_template, request, redirect, url_for, jsonify # <--- Garanta que jsonify esteja aqui
+from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
+bcrypt = Bcrypt(app)
 app.config['SECRET_KEY'] = 'uma_chave_muito_segura_aqui'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 db = SQLAlchemy(app)
@@ -59,101 +61,71 @@ def home():
 @app.route("/cadastro", methods=['GET', 'POST'])
 def cadastro():
     if request.method == 'POST':
+        # Pegando os dados que o JavaScript enviou
         email = request.form.get('email')
         usuario = request.form.get('usuario')
         senha = request.form.get('senha')
         nome = request.form.get('nome')
         sobrenome = request.form.get('sobrenome')
         data_nascimento = request.form.get('data_nascimento')
-        # ... pegue os outros campos se tiver (nome, sobrenome) ...
 
-        # 1. Gera um código de 6 dígitos aleatórios
+        # Criptografando a senha (SEGURANÇA!)
+        senha_cripto = bcrypt.generate_password_hash(senha).decode('utf-8')
+
         codigo = str(random.randint(100000, 999999))
 
-        # 2. Cria o usuário com verificado=False e guarda o código
-        novo_usuario = User(
-        nome=nome,
-        sobrenome=sobrenome,
-        username=usuario,
-        email=email,
-        senha=senha,
-        data_nascimento=data_nascimento,  # <--- Aqui!
-        codigo_verificacao=codigo,
-        verificado=False
-    )
-        
-        db.session.add(novo_usuario)
-        db.session.commit()
-
-        # 3. Envia o e-mail com o código
-        msg = Message('Código de Verificação - DiDex', recipients=[email])
-        
-        msg.html = f"""
-        <div style="background-color: #f3f4f6; padding: 40px 20px; font-family: Arial, sans-serif; text-align: center;">
-            <div style="max-width: 450px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; padding: 40px; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-                
-                <div style="margin-bottom: 30px; text-align: center;">
-                    <img src="cid:logo_image" alt="DiDex" style="width: 150px; display: block; margin: 0 auto;">
-                </div>
-
-                <div style="border-top: 1px solid #f3f4f6; padding-top: 30px;">
-                    <h2 style="color: #111827; font-size: 20px; margin-bottom: 10px; font-weight: bold;">Use o código a seguir para validar seu cadastro</h2>
-                    <p style="color: #6b7280; font-size: 15px; margin-bottom: 30px;">
-                        Por segurança, nunca compartilhe seus códigos com ninguém.
-                    </p>
-
-                    <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 25px; display: block;">
-                        <span style="font-size: 36px; font-weight: 800; letter-spacing: 12px; color: #111827; font-family: monospace;">
-                            {codigo}
-                        </span>
-                    </div>
-
-                    <p style="color: #9ca3af; font-size: 13px; margin-top: 40px;">
-                        Precisa de ajuda? <a href="#" style="color: #38bdf8; text-decoration: none; font-weight: 600;">Fale conosco</a>.
-                    </p>
-                </div>
-            </div>
-            <p style="color: #9ca3af; font-size: 12px; margin-top: 25px;">
-                © 2026 DiDex - Conecte sua essência.
-            </p>
-        </div>
-        """
-
-        # Certifique-se de que a imagem está na pasta static com o nome logo.png
-        # Verifique se esse bloco existe logo após o msg.html:
-        # Verifique se o nome do arquivo na pasta static é logo.png (tudo minúsculo)
-        # Certifique-se de que o arquivo se chama logo.png e está na pasta static
-        with app.open_resource("static/logo.png") as fp:
-            msg.attach(
-                "logo.png", 
-                "image/png", 
-                fp.read(), 
-                headers={'Content-ID': '<logo_image>'}
+        try:
+            novo_usuario = User(
+                nome=nome,
+                sobrenome=sobrenome,
+                username=usuario,
+                email=email,
+                senha=senha_cripto, # Salvando a senha protegida
+                data_nascimento=data_nascimento,
+                codigo_verificacao=codigo,
+                verificado=False
             )
-        
-        mail.send(msg)
+            
+            db.session.add(novo_usuario)
+            db.session.commit()
 
-        return redirect(url_for('verificar_email', email=email))
+            # Envio do E-mail
+            msg = Message('Código de Verificação - DiDex', recipients=[email])
+            msg.html = f"<h2>Seu código é: {codigo}</h2>" # Simplifiquei para teste
+            
+            # Tenta anexar a logo, se falhar ele envia sem logo para não travar o botão
+            try:
+                with app.open_resource("static/logo.png") as fp:
+                    msg.attach("logo.png", "image/png", fp.read(), headers={'Content-ID': '<logo_image>'})
+            except:
+                pass 
+
+            mail.send(msg)
+            
+            # AQUI ESTÁ O SEGREDO: Respondendo JSON para o JavaScript
+            return jsonify({'status': 'sucesso', 'url': url_for('verificar_email', email=email)})
+
+        except Exception as e:
+            print(f"Erro no cadastro: {e}")
+            return jsonify({'status': 'erro', 'mensagem': 'Erro ao salvar no banco.'}), 500
+
     return render_template('cadastro.html')
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        # Tudo aqui dentro tem que estar alinhado com o recuo do IF
-        usuario_digitado = request.form.get('email_usuario') # <--- Ajustei para bater com o JavaScript
+        usuario_digitado = request.form.get('email_usuario')
         senha_digitada = request.form.get('senha')
         
-        # Procura o usuário no banco
         usuario = User.query.filter((User.email == usuario_digitado) | (User.username == usuario_digitado)).first()
 
-        # Verifica se a senha bate
-        if usuario and usuario.senha == senha_digitada:
+        # USANDO O BCRYPT PARA COMPARAR A SENHA
+        if usuario and bcrypt.check_password_hash(usuario.senha, senha_digitada):
             login_user(usuario)
             return jsonify({'status': 'sucesso'})
         else:
             return jsonify({'status': 'erro', 'mensagem': 'Usuário ou senha incorretos'}), 401
     
-    # Se for GET, apenas carrega a página
     return render_template('login.html')
 
 @app.route("/logout")

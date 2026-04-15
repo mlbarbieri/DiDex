@@ -174,7 +174,7 @@
         }
     }
 
-    // FUNÇÃO PRINCIPAL DE CADASTRO
+    // FUNÇÃO PRINCIPAL DE CADASTRO (Ajustada para o novo app.py)
     async function fazerCadastro() {
         const erroGeral = document.getElementById('erro-geral');
         erroGeral.style.display = 'none';
@@ -193,20 +193,22 @@
                 body: dados
             });
 
-            if (response.redirected) {
-                // Se o Flask mandar para a página de verificação de e-mail
-                window.location.href = response.url;
+            const result = await response.json();
+
+            if (result.status === 'sucesso') {
+                // Se deu certo, o Python mandou a URL de destino no JSON
+                window.location.href = result.url;
             } else {
-                const result = await response.json();
-                if (result.status === 'erro') {
-                    erroGeral.innerText = "⚠️ " + result.mensagem;
-                    erroGeral.style.display = 'block';
-                }
+                // Se deu erro (e-mail já existe, etc)
+                erroGeral.innerText = "⚠️ " + result.mensagem;
+                erroGeral.style.display = 'block';
             }
         } catch (e) {
             console.error("Erro no cadastro:", e);
+            erroGeral.innerText = "⚠️ Erro ao conectar com o servidor.";
+            erroGeral.style.display = 'block';
         }
     }
-    </script>
+</script>
 </body>
 </html>
