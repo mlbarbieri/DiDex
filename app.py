@@ -61,7 +61,6 @@ def home():
 @app.route("/cadastro", methods=['GET', 'POST'])
 def cadastro():
     if request.method == 'POST':
-        # Pegando os dados que o JavaScript enviou
         email = request.form.get('email')
         usuario = request.form.get('usuario')
         senha = request.form.get('senha')
@@ -69,45 +68,41 @@ def cadastro():
         sobrenome = request.form.get('sobrenome')
         data_nascimento = request.form.get('data_nascimento')
 
-        # Criptografando a senha (SEGURANÇA!)
+        # Criptografia
         senha_cripto = bcrypt.generate_password_hash(senha).decode('utf-8')
-
         codigo = str(random.randint(100000, 999999))
 
         try:
+            # 1. Primeiro salvamos o usuário (O mais importante)
             novo_usuario = User(
                 nome=nome,
                 sobrenome=sobrenome,
                 username=usuario,
                 email=email,
-                senha=senha_cripto, # Salvando a senha protegida
+                senha=senha_cripto,
                 data_nascimento=data_nascimento,
                 codigo_verificacao=codigo,
                 verificado=False
             )
-            
             db.session.add(novo_usuario)
             db.session.commit()
 
-            # Envio do E-mail
-            msg = Message('Código de Verificação - DiDex', recipients=[email])
-            msg.html = f"<h2>Seu código é: {codigo}</h2>" # Simplifiquei para teste
-            
-            # Tenta anexar a logo, se falhar ele envia sem logo para não travar o botão
+            # 2. Tentamos enviar o e-mail, mas se der erro, o site NÃO trava
             try:
-                with app.open_resource("static/logo.png") as fp:
-                    msg.attach("logo.png", "image/png", fp.read(), headers={'Content-ID': '<logo_image>'})
-            except:
-                pass 
+                msg = Message('Código de Verificação - DiDex', recipients=[email])
+                msg.body = f"Seu código de verificação é: {codigo}"
+                # Comentei a parte da logo para evitar erros de caminho no servidor por enquanto
+                mail.send(msg)
+            except Exception as e_mail:
+                print(f"Erro ao enviar e-mail: {e_mail}")
+                # O cadastro continua mesmo se o e-mail falhar
 
-            mail.send(msg)
-            
-            # AQUI ESTÁ O SEGREDO: Respondendo JSON para o JavaScript
             return jsonify({'status': 'sucesso', 'url': url_for('verificar_email', email=email)})
 
         except Exception as e:
-            print(f"Erro no cadastro: {e}")
-            return jsonify({'status': 'erro', 'mensagem': 'Erro ao salvar no banco.'}), 500
+            db.session.rollback() # Cancela se der erro no banco
+            print(f"Erro no banco: {e}")
+            return jsonify({'status': 'erro', 'mensagem': 'Usuário ou E-mail já existem!'}), 400
 
     return render_template('cadastro.html')
 
