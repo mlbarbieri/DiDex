@@ -212,6 +212,10 @@ def checar_email():
     email = request.json.get('email')
     existe = User.query.filter_by(email=email).first() is not None
     return jsonify({'disponivel': not existe})
+# No final do seu app.py
+with app.app_context():
+    db.create_all() # Isso cria o arquivo .db e as tabelas se elas não existirem
+    print("Banco de dados verificado/criado com sucesso!")
 
 if __name__ == '__main__':
     app.run(debug=True)
