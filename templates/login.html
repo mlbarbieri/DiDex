@@ -2,16 +2,25 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - DiDex</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
+        :root { 
+            --bg-dark: #0f172a; 
+            --card-bg: #1e293b; 
+            --accent: #38bdf8; 
+            --text-dim: #64748b; 
+        }
+
         body {
-            background-color: #0f172a;
+            background-color: var(--bg-dark);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         .login-box {
@@ -33,10 +42,15 @@
             letter-spacing: -2px;
         }
 
+        .input-container {
+            position: relative;
+            width: 100%;
+            margin-bottom: 18px;
+        }
+
         input {
             width: 100%;
             padding: 16px;
-            margin-bottom: 15px;
             border-radius: 12px;
             border: 1px solid #1e293b;
             background-color: #1e293b;
@@ -44,11 +58,23 @@
             font-size: 16px;
             box-sizing: border-box;
             outline: none;
+            transition: 0.2s;
         }
 
         input:focus {
             border-color: #38bdf8;
             box-shadow: 0 0 0 1px #38bdf8;
+        }
+
+        .eye-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #64748b;
+            font-size: 20px;
+            z-index: 10;
         }
 
         .btn-entrar {
@@ -88,71 +114,120 @@
             margin-bottom: 15px;
             font-weight: bold;
         }
+
+        /* CSS DO LOADER */
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(56, 189, 248, 0.1);
+            border-top: 5px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .btn-loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
 
+    <div id="loader-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(5px); z-index: 9999; justify-content: center; align-items: center; flex-direction: column;">
+        <div class="spinner"></div>
+        <p style="color: var(--accent); margin-top: 15px; font-weight: 600; font-family: 'Inter', sans-serif;">Validando acesso...</p>
+    </div>
+
     <div class="login-box">
-    <div class="logo-text">DiDex</div>
-    
-    <div id="erro-login">⚠️ Usuário ou senha incorretos.</div>
+        <div class="logo-text">DiDex</div>
+        
+        <div id="erro-login">⚠️ Usuário ou senha incorretos.</div>
 
-    <input type="text" id="usuario_login" oninput="limparErro(this)" placeholder="Nome de usuário ou e-mail">
-<input type="password" id="senha_login" oninput="limparErro(this)" placeholder="Senha">
+        <form id="formLogin">
+            <div class="input-container">
+                <input type="text" id="usuario_login" oninput="limparErro(this)" placeholder="Nome de usuário ou e-mail">
+            </div>
 
-<button type="button" onclick="fazerLogin()" class="btn-entrar">Entrar</button>
+            <div class="input-container">
+                <input type="password" id="senha_login" oninput="limparErro(this)" placeholder="Senha">
+                <i class="ph ph-eye-slash eye-icon" id="toggleLogin"></i>
+            </div>
 
-    <p class="link-cadastro">
-        Não tem conta? <a href="/cadastro">Cadastre-se</a>
-    </p>
-</div>
-<script>
-async function fazerLogin() {
-    const user = document.getElementById('usuario_login').value;
-    const pass = document.getElementById('senha_login').value;
-    const erroDiv = document.getElementById('erro-login');
+            <button type="button" onclick="fazerLogin()" class="btn-entrar" id="btn-entrar">Entrar</button>
+        </form>
 
-    const dados = new URLSearchParams();
-    dados.append('email_usuario', user);
-    dados.append('senha', pass);
+        <p class="link-cadastro">
+            Não tem conta? <a href="/cadastro">Cadastre-se</a>
+        </p>
+    </div>
 
-    try {
-        const response = await fetch('/login', {
-            method: 'POST',
-            body: dados
+    <script>
+        // Lógica do Olhinho
+        const toggleLogin = document.getElementById('toggleLogin');
+        const senhaLogin = document.getElementById('senha_login');
+
+        toggleLogin.addEventListener('click', function() {
+            const type = senhaLogin.type === 'password' ? 'text' : 'password';
+            senhaLogin.type = type;
+            this.classList.toggle('ph-eye');
+            this.classList.toggle('ph-eye-slash');
         });
 
-        const data = await response.json();
+        // Função de Login com Loader
+        async function fazerLogin() {
+            const user = document.getElementById('usuario_login').value;
+            const pass = document.getElementById('senha_login').value;
+            const erroDiv = document.getElementById('erro-login');
+            const loader = document.getElementById('loader-overlay');
+            const btn = document.getElementById('btn-entrar');
 
-        if (response.ok && data.status === 'sucesso') {
-            window.location.href = '/home';
-        } else {
-            // 1. Mostra a mensagem vermelha
-            erroDiv.style.display = 'block';
+            // Mostrar loader
+            loader.style.display = 'flex';
+            btn.classList.add('btn-loading');
 
-            // 2. PINTA AS BORDAS DE VERMELHO
-            document.getElementById('usuario_login').style.borderColor = '#ff4d4d';
-            document.getElementById('senha_login').style.borderColor = '#ff4d4d';
-            
-            // 3. Adiciona o brilho vermelho
-            document.getElementById('usuario_login').style.boxShadow = '0 0 5px rgba(255, 77, 77, 0.5)';
-            document.getElementById('senha_login').style.boxShadow = '0 0 5px rgba(255, 77, 77, 0.5)';
+            const dados = new URLSearchParams();
+            dados.append('email_usuario', user);
+            dados.append('senha', pass);
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    body: dados
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.status === 'sucesso') {
+                    window.location.href = '/home';
+                } else {
+                    // Esconder loader se der erro
+                    loader.style.display = 'none';
+                    btn.classList.remove('btn-loading');
+                    
+                    erroDiv.style.display = 'block';
+                    document.getElementById('usuario_login').style.borderColor = '#ff4d4d';
+                    document.getElementById('senha_login').style.borderColor = '#ff4d4d';
+                    document.getElementById('usuario_login').style.boxShadow = '0 0 5px rgba(255, 77, 77, 0.5)';
+                    document.getElementById('senha_login').style.boxShadow = '0 0 5px rgba(255, 77, 77, 0.5)';
+                }
+            } catch (err) {
+                loader.style.display = 'none';
+                btn.classList.remove('btn-loading');
+                console.error("Erro no JS: ", err);
+            }
         }
-    } catch (err) {
-        console.error("Erro no JS: ", err);
-    }
-}
 
-// ESTA FUNÇÃO FICA FORA DA OUTRA
-function limparErro(input) {
-    // Volta a borda para a cor original (azul escura) e tira o brilho
-    input.style.borderColor = '#1e293b';
-    input.style.boxShadow = 'none';
-    
-    // Esconde a mensagem de texto do erro
-    document.getElementById('erro-login').style.display = 'none';
-}
-</script>
+        function limparErro(input) {
+            input.style.borderColor = '#1e293b';
+            input.style.boxShadow = 'none';
+            document.getElementById('erro-login').style.display = 'none';
+        }
+    </script>
 
 </body>
 </html>

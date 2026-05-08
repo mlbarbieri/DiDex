@@ -2,114 +2,214 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro - DiDex</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
-        body {
-            background-color: #0f172a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            font-family: 'Segoe UI', sans-serif;
+        :root { 
+            --bg-dark: #0f172a; 
+            --card-bg: #1e293b; 
+            --accent: #38bdf8; 
+            --text-main: #f1f5f9; 
+            --text-dim: #94a3b8; 
         }
 
-        .cadastro-box {
-            width: 100%;
-            max-width: 420px;
-            padding: 20px;
-            text-align: center;
+        body { 
+            background-color: var(--bg-dark); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            font-family: 'Inter', sans-serif; 
         }
 
-        .logo-text {
-            font-size: 50px;
-            font-weight: 800;
-            background: linear-gradient(to right, #38bdf8, #818cf8);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 30px;
-            filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.3));
-            letter-spacing: -1px;
+        .cadastro-box { 
+            width: 100%; 
+            max-width: 420px; 
+            padding: 20px; 
+            text-align: center; 
         }
 
-        input {
-            width: 100%;
-            padding: 14px;
-            margin-bottom: 12px;
-            border-radius: 10px;
-            border: 1px solid #334155;
-            background-color: #1e293b;
-            color: white;
-            font-size: 15px;
-            box-sizing: border-box;
-            outline: none;
-            transition: border-color 0.2s;
+        .logo-text { 
+            font-size: 50px; 
+            font-weight: 800; 
+            background: linear-gradient(to right, #38bdf8, #818cf8); 
+            -webkit-background-clip: text; 
+            background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            margin-bottom: 30px; 
+            filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.3)); 
+            letter-spacing: -1px; 
+        }
+        
+        .input-container { 
+            position: relative; 
+            width: 100%; 
+            margin-bottom: 18px; 
         }
 
-        input:focus {
-            border-color: #38bdf8;
+        input { 
+            width: 100%; 
+            padding: 14px; 
+            border-radius: 10px; 
+            border: 1px solid #334155; 
+            background-color: #1e293b; 
+            color: white; 
+            font-size: 15px; 
+            box-sizing: border-box; 
+            outline: none; 
+            transition: 0.2s; 
         }
 
-        .btn-entrar {
-            width: 100%;
-            padding: 16px;
-            background-color: #38bdf8;
-            color: #0f172a;
-            border: none;
-            border-radius: 15px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 15px;
-            transition: transform 0.2s;
+        input:focus { border-color: #38bdf8; }
+
+        .eye-icon { 
+            position: absolute; 
+            right: 15px; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            cursor: pointer; 
+            color: var(--text-dim); 
+            font-size: 20px; 
+            z-index: 10;
+        }
+        
+        .btn-entrar { 
+            width: 100%; 
+            padding: 16px; 
+            background-color: #38bdf8; 
+            color: #0f172a; 
+            border: none; 
+            border-radius: 15px; 
+            font-size: 16px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin-top: 15px; 
+            transition: transform 0.2s; 
         }
 
-        .btn-entrar:hover {
-            transform: scale(1.02);
-            background-color: #7dd3fc;
+        .btn-entrar:hover { 
+            transform: scale(1.02); 
+            background-color: #7dd3fc; 
         }
 
-        .msg-erro {
-            color: #ff4d4d;
-            font-size: 12px;
-            display: none;
-            margin-bottom: 10px;
-            text-align: left;
-            font-weight: bold;
+        .msg-erro { 
+            color: #ff4d4d; 
+            font-size: 12px; 
+            display: none; 
+            margin-bottom: 8px; 
+            text-align: left; 
+            font-weight: bold; 
         }
 
-        #erro-geral {
-            text-align: center;
-            font-size: 14px;
-            background: rgba(255, 77, 77, 0.1);
-            padding: 10px;
-            border-radius: 8px;
+        #erro-geral { 
+            text-align: center; 
+            font-size: 14px; 
+            background: rgba(255, 77, 77, 0.1); 
+            padding: 10px; 
+            border-radius: 8px; 
+            margin-bottom: 20px;
+        }
+
+        .painel-forca { 
+            display: none; 
+            background: #1e293b; 
+            border: 1px solid #334155; 
+            border-radius: 10px; 
+            padding: 15px; 
+            margin-bottom: 18px; 
+            text-align: left; 
+        }
+
+        .req-item { 
+            font-size: 12px; 
+            color: #94a3b8; 
+            margin-bottom: 5px; 
+            transition: 0.3s; 
+        }
+
+        /* CSS DO LOADER */
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(56, 189, 248, 0.1);
+            border-top: 5px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .btn-loading {
+            opacity: 0.7;
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
+    <div id="loader-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(5px); z-index: 9999; justify-content: center; align-items: center; flex-direction: column;">
+        <div class="spinner"></div>
+        <p style="color: var(--accent); margin-top: 15px; font-weight: 600; font-family: 'Inter', sans-serif;">Criando sua conta DiDex...</p>
+    </div>
 
     <div class="cadastro-box">
         <div class="logo-text">Crie sua conta</div>
-
         <div id="erro-geral" class="msg-erro"></div>
 
-        <input type="text" id="nome" placeholder="Nome" autocomplete="off">
-        
-        <input type="text" id="sobrenome" placeholder="Sobrenome" autocomplete="off">
+        <form id="formCadastro">
+            <div class="input-container">
+                <input type="text" id="nome" placeholder="Nome" autocomplete="off">
+            </div>
 
-        <input type="text" id="usuario_cad" placeholder="Nome de usuário" autocomplete="off" onblur="validarUsuario()">
-        <div id="erro-usuario" class="msg-erro">⚠️ Este nome de usuário não está disponível.</div>
+            <div class="input-container">
+                <input type="text" id="sobrenome" placeholder="Sobrenome" autocomplete="off">
+            </div>
 
-        <input type="email" id="email_cad" placeholder="E-mail" autocomplete="off" onblur="validarEmail()">
-        <div id="erro-email" class="msg-erro">⚠️ Este e-mail já está cadastrado.</div>
+            <div class="input-container">
+                <input type="text" id="usuario_cad" placeholder="Nome de usuário" autocomplete="off" onblur="validarUsuario()">
+                <div id="erro-usuario" class="msg-erro">⚠️ Este nome de usuário não está disponível.</div>
+            </div>
 
-        <input type="password" id="senha_cad" placeholder="Senha" autocomplete="new-password">
+            <div class="input-container">
+                <input type="email" id="email_cad" placeholder="E-mail" autocomplete="off" onblur="validarEmail()">
+                <div id="erro-email" class="msg-erro">⚠️ Este e-mail já está cadastrado.</div>
+            </div>
 
-        <input type="text" id="data_nasc" placeholder="Data de Nascimento (dd/mm/aaaa)" maxlength="10" oninput="mascaraData(this)" autocomplete="off">
+            <div class="input-container">
+                <input type="password" id="senha_cad" placeholder="Senha" autocomplete="new-password" 
+                       onfocus="mostrarRequisitos()" oninput="validarSenhaForca()">
+                <i class="ph ph-eye-slash eye-icon" id="toggleSenha"></i>
+            </div>
+            
+            <div id="painel-forca" class="painel-forca">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="color: #94a3b8; font-size: 12px;">Força da senha:</span>
+                    <span id="texto-forca" style="font-size: 12px; font-weight: bold; color: #ff4d4d;">Fraca</span>
+                </div>
+                <div style="width: 100%; height: 4px; background: #334155; border-radius: 2px; margin-bottom: 12px;">
+                    <div id="barra-progresso" style="width: 0%; height: 100%; background: #ff4d4d; border-radius: 2px; transition: 0.3s;"></div>
+                </div>
+                <div class="req-item" id="req-8">○ Pelo menos 8 caracteres</div>
+                <div class="req-item" id="req-mai">○ Uma letra maiúscula</div>
+                <div class="req-item" id="req-num">○ Um número</div>
+            </div>
 
-        <button type="button" onclick="fazerCadastro()" class="btn-entrar">Cadastrar</button>
+            <div class="input-container">
+                <div id="msgErroSenha" class="msg-erro">⚠️ As senhas não coincidem.</div>
+                <input type="password" id="confirmar_senha" placeholder="Confirmar Senha" autocomplete="off" oninput="validarComparacao()">
+                <i class="ph ph-eye-slash eye-icon" id="toggleConfirmar"></i>
+            </div>
+
+            <div class="input-container">
+                <input type="text" id="data_nasc" placeholder="Data de Nascimento (dd/mm/aaaa)" maxlength="10" oninput="mascaraData(this)" autocomplete="off">
+            </div>
+
+            <button type="button" onclick="fazerCadastro()" class="btn-entrar" id="btn-cadastrar">Cadastrar</button>
+        </form>
 
         <p style="margin-top: 25px; color: #94a3b8; font-size: 14px;">
             Já tem conta? <a href="/login" style="color: #38bdf8; text-decoration: none;">Faça login</a>
@@ -117,98 +217,150 @@
     </div>
 
     <script>
-    // Máscara da Data
+    function setupToggle(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        icon.addEventListener('click', function() {
+            const type = input.type === 'password' ? 'text' : 'password';
+            input.type = type;
+            this.classList.toggle('ph-eye');
+            this.classList.toggle('ph-eye-slash');
+        });
+    }
+    setupToggle('senha_cad', 'toggleSenha');
+    setupToggle('confirmar_senha', 'toggleConfirmar');
+
+    function validarComparacao() {
+        const s1 = document.getElementById('senha_cad').value;
+        const s2 = document.getElementById('confirmar_senha').value;
+        const msg = document.getElementById('msgErroSenha');
+        const input = document.getElementById('confirmar_senha');
+
+        if (s2.length > 0 && s1 !== s2) {
+            input.style.borderColor = "#ff4d4d";
+            msg.style.display = "block";
+        } else {
+            input.style.borderColor = "#334155";
+            msg.style.display = "none";
+        }
+    }
+
+    function mostrarRequisitos() {
+        document.getElementById('painel-forca').style.display = 'block';
+    }
+
+    function validarSenhaForca() {
+        const senha = document.getElementById('senha_cad').value;
+        const barra = document.getElementById('barra-progresso');
+        const texto = document.getElementById('texto-forca');
+        
+        const tem8 = senha.length >= 8;
+        const temMai = /[A-Z]/.test(senha);
+        const temNum = /[0-9]/.test(senha);
+
+        atualizarReq('req-8', tem8);
+        atualizarReq('req-mai', temMai);
+        atualizarReq('req-num', temNum);
+
+        let pontos = 0;
+        if (tem8) pontos += 33;
+        if (temMai) pontos += 33;
+        if (temNum) pontos += 34;
+
+        barra.style.width = pontos + "%";
+        if (pontos <= 33) { barra.style.background = "#ff4d4d"; texto.innerText = "Fraca"; texto.style.color = "#ff4d4d"; }
+        else if (pontos <= 66) { barra.style.background = "#fbbf24"; texto.innerText = "Média"; texto.style.color = "#fbbf24"; }
+        else { barra.style.background = "#22c55e"; texto.innerText = "Forte"; texto.style.color = "#22c55e"; }
+        
+        validarComparacao();
+    }
+
+    function atualizarReq(id, valido) {
+        const el = document.getElementById(id);
+        const textoBase = el.innerText.replace(/[○✓]/g, "").trim();
+        el.innerHTML = (valido ? "✓ " : "○ ") + textoBase;
+        el.style.color = valido ? "#22c55e" : "#94a3b8";
+    }
+
     function mascaraData(input) {
         let v = input.value.replace(/\D/g, "");
         if (v.length > 8) v = v.slice(0, 8);
-        if (v.length >= 5) {
-            input.value = v.substring(0, 2) + "/" + v.substring(2, 4) + "/" + v.substring(4, 8);
-        } else if (v.length >= 3) {
-            input.value = v.substring(0, 2) + "/" + v.substring(2, 4);
-        } else {
-            input.value = v;
-        }
+        if (v.length >= 5) input.value = v.substring(0, 2) + "/" + v.substring(2, 4) + "/" + v.substring(4, 8);
+        else if (v.length >= 3) input.value = v.substring(0, 2) + "/" + v.substring(2, 4);
+        else input.value = v;
     }
 
-    // Validação de Usuário Existente
     async function validarUsuario() {
         const username = document.getElementById('usuario_cad').value;
-        const erroDiv = document.getElementById('erro-usuario');
-        const input = document.getElementById('usuario_cad');
         if (!username) return;
-
-        const response = await fetch('/checar_usuario', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({username: username})
-        });
+        const response = await fetch('/checar_usuario', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: username}) });
         const data = await response.json();
-        if (!data.disponivel) {
-            erroDiv.style.display = 'block';
-            input.style.borderColor = '#ff4d4d';
-        } else {
-            erroDiv.style.display = 'none';
-            input.style.borderColor = '#334155';
-        }
+        document.getElementById('erro-usuario').style.display = data.disponivel ? 'none' : 'block';
+        document.getElementById('usuario_cad').style.borderColor = data.disponivel ? '#334155' : '#ff4d4d';
     }
 
-    // Validação de E-mail Existente
     async function validarEmail() {
         const email = document.getElementById('email_cad').value;
-        const erroDiv = document.getElementById('erro-email');
-        const input = document.getElementById('email_cad');
         if (!email) return;
-
-        const response = await fetch('/checar_email', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({email: email})
-        });
+        const response = await fetch('/checar_email', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({email: email}) });
         const data = await response.json();
-        if (!data.disponivel) {
-            erroDiv.style.display = 'block';
-            input.style.borderColor = '#ff4d4d';
-        } else {
-            erroDiv.style.display = 'none';
-            input.style.borderColor = '#334155';
-        }
+        document.getElementById('erro-email').style.display = data.disponivel ? 'none' : 'block';
+        document.getElementById('email_cad').style.borderColor = data.disponivel ? '#334155' : '#ff4d4d';
     }
 
-    // FUNÇÃO PRINCIPAL DE CADASTRO (Ajustada para o novo app.py)
     async function fazerCadastro() {
         const erroGeral = document.getElementById('erro-geral');
+        const s1 = document.getElementById('senha_cad').value;
+        const s2 = document.getElementById('confirmar_senha').value;
+        const loader = document.getElementById('loader-overlay');
+        const btn = document.getElementById('btn-cadastrar');
+
         erroGeral.style.display = 'none';
+
+        // Validações básicas antes de mostrar o loader
+        if (s1 !== s2) {
+            erroGeral.innerText = "⚠️ As senhas não coincidem.";
+            erroGeral.style.display = 'block';
+            return;
+        }
+
+        if (s1.length < 8 || !/[A-Z]/.test(s1) || !/[0-9]/.test(s1)) {
+            erroGeral.innerText = "⚠️ Sua senha precisa cumprir todos os requisitos.";
+            erroGeral.style.display = 'block';
+            return;
+        }
+
+        // MOSTRAR LOADER
+        loader.style.display = 'flex';
+        btn.classList.add('btn-loading');
 
         const dados = new URLSearchParams();
         dados.append('nome', document.getElementById('nome').value);
         dados.append('sobrenome', document.getElementById('sobrenome').value);
         dados.append('usuario', document.getElementById('usuario_cad').value);
         dados.append('email', document.getElementById('email_cad').value);
-        dados.append('senha', document.getElementById('senha_cad').value);
+        dados.append('senha', s1);
         dados.append('data_nascimento', document.getElementById('data_nasc').value);
 
         try {
-            const response = await fetch('/cadastro', {
-                method: 'POST',
-                body: dados
-            });
-
+            const response = await fetch('/cadastro', { method: 'POST', body: dados });
             const result = await response.json();
-
+            
             if (result.status === 'sucesso') {
-                // Se deu certo, o Python mandou a URL de destino no JSON
                 window.location.href = result.url;
-            } else {
-                // Se deu erro (e-mail já existe, etc)
-                erroGeral.innerText = "⚠️ " + result.mensagem;
-                erroGeral.style.display = 'block';
+            } else { 
+                loader.style.display = 'none';
+                btn.classList.remove('btn-loading');
+                erroGeral.innerText = "⚠️ " + result.mensagem; 
+                erroGeral.style.display = 'block'; 
             }
-        } catch (e) {
-            console.error("Erro no cadastro:", e);
-            erroGeral.innerText = "⚠️ Erro ao conectar com o servidor.";
-            erroGeral.style.display = 'block';
+        } catch (e) { 
+            loader.style.display = 'none';
+            btn.classList.remove('btn-loading');
+            erroGeral.innerText = "⚠️ Erro ao conectar com o servidor."; 
+            erroGeral.style.display = 'block'; 
         }
     }
-</script>
+    </script>
 </body>
 </html>

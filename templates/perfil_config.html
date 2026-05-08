@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <title>Configurações - DiDex</title>
+    <style>
+        :root { --bg-dark: #0f172a; --card-bg: #1e293b; --accent: #38bdf8; --text-main: #f1f5f9; }
+        body { background-color: var(--bg-dark); color: var(--text-main); font-family: 'Inter', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .config-box { background: var(--card-bg); border-radius: 16px; padding: 40px; border: 1px solid #334155; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .current-avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 20px; border: 2px solid var(--accent); }
+        input[type="file"] { background: transparent; border: 1px solid #334155; border-radius: 8px; color: var(--text-main); padding: 10px; width: 100%; margin-bottom: 20px; box-sizing: border-box; }
+        .btn-salvar { background: var(--accent); color: #0f172a; border: none; padding: 10px 20px; border-radius: 30px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        .btn-salvar:hover { filter: brightness(1.1); }
+        .btn-voltar { color: #94a3b8; text-decoration: none; font-size: 14px; display: block; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    
+
+    <div class="config-box">
+        <h1>Alterar Foto de Perfil</h1>
+        
+        {% if usuario.foto_perfil == 'default_avatar.png' %}
+            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #38bdf8, #818cf8); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; color: white; margin: 0 auto 20px;">
+                {{ usuario.nome[0].upper() }}
+            </div>
+        {% else %}
+            <img src="{{ url_for('static', filename='profile_pics/' + usuario.foto_perfil) }}" alt="Foto de Perfil" class="current-avatar">
+        {% endif %}
+
+        <form action="{{ url_for('upload_foto') }}" method="POST" enctype="multipart/form-data">
+            <input type="file" name="foto" accept="image/*" required>
+            <button type="submit" class="btn-salvar">Salvar Nova Foto</button>
+        </form>
+
+        <a href="{{ url_for('perfil', username=usuario.username) }}" class="btn-voltar">← Cancelar</a>
+    </div>
+
+</body>
+</html>
